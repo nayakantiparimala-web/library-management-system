@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Management System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            margin: 0;
+        }
+
+        header {
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            width: 28%;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .delete {
+            background: red;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #222;
+            color: white;
+        }
+
+        #count {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Library Management System</h1>
+    <p>Full Stack Development Project</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Add Book</h2>
+
+        <input type="text" id="title" placeholder="Book Title">
+        <input type="text" id="author" placeholder="Author Name">
+        <input type="text" id="category" placeholder="Category">
+
+        <button onclick="addBook()">Add Book</button>
+    </div>
+
+    <div class="card">
+        <h2>Search Book</h2>
+
+        <input type="text"
+               id="search"
+               placeholder="Search book..."
+               onkeyup="searchBook()">
+
+        <p>Total Books: <span id="count">0</span></p>
+    </div>
+
+    <div class="card">
+
+        <h2>Book Details</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="bookTable"></tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+    let books =
+        JSON.parse(localStorage.getItem("books")) || [];
+
+    displayBooks(books);
+
+    function addBook() {
+
+        let title =
+            document.getElementById("title").value.trim();
+
+        let author =
+            document.getElementById("author").value.trim();
+
+        let category =
+            document.getElementById("category").value.trim();
+
+        if (title === "" || author === "" || category === "") {
+            alert("Please fill all fields");
+            return;
+        }
+
+        let book = {
+            title: title,
+            author: author,
+            category: category
+        };
+
+        books.push(book);
+
+        localStorage.setItem(
+            "books",
+            JSON.stringify(books)
+        );
+
+        document.getElementById("title").value = "";
+        document.getElementById("author").value = "";
+        document.getElementById("category").value = "";
+
+        displayBooks(books);
+    }
+
+    function displayBooks(list) {
+
+        let table =
+            document.getElementById("bookTable");
+
+        table.innerHTML = "";
+
+        list.forEach(function(book, index) {
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${book.title}</td>
+                <td>${book.author}</td>
+                <td>${book.category}</td>
+                <td>
+                    <button class="delete"
+                        onclick="deleteBook(${index})">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            table.appendChild(row);
+        });
+
+        document.getElementById("count").innerText =
+            list.length;
+    }
+
+    function deleteBook(index) {
+
+        books.splice(index, 1);
+
+        localStorage.setItem(
+            "books",
+            JSON.stringify(books)
+        );
+
+        displayBooks(books);
+    }
+
+    function searchBook() {
+
+        let text =
+            document.getElementById("search")
+            .value
+            .toLowerCase();
+
+        let filtered =
+            books.filter(function(book) {
+
+                return (
+                    book.title.toLowerCase().includes(text) ||
+                    book.author.toLowerCase().includes(text) ||
+                    book.category.toLowerCase().includes(text)
+                );
+            });
+
+        displayBooks(filtered);
+    }
+
+</script>
+
+</body>
+</html>
